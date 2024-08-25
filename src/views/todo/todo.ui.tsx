@@ -2,41 +2,50 @@
 
 'use client';
 
-import { Edit2Icon, PlusIcon, SparklesIcon, Trash2Icon } from 'lucide-react';
+import { Skeleton } from '@nextui-org/react';
+
+import { useTaskListByTodoIdQuery } from '@/entities/task';
+import { AddTaskModal, AddTaskWithAIModal } from '@/features/task';
+import { DeleteTodoModal, RenameTodoListModal } from '@/features/todo';
 
 import { TodoList } from './todo-list.ui';
 
-export function TodoUI() {
+export function TodoUI({ todoId }: { todoId: string }) {
+  const { data } = useTaskListByTodoIdQuery({ todoId });
+
   return (
     <div className="w-full px-12 py-16">
       <div className="mb-8">
         <div className="flex flex-row items-center gap-6">
-          <h1 className="text-3xl font-medium text-gray-600">Completed List</h1>
+          <h1 className="text-xl font-medium text-gray-600 md:text-3xl">
+            {Object.keys(data || {}).length > 0 ? (
+              data?.title
+            ) : (
+              <Skeleton className="h-[36px] w-[180px] rounded-md" />
+            )}
+          </h1>
           <div className="flex flex-row items-center gap-3">
-            <Edit2Icon className="flex-shrink-0 text-green-700" size={20} />
-            <Trash2Icon className="flex-shrink-0 text-red-700" size={20} />
+            {Object.keys(data ?? {}).length > 0 && (
+              <>
+                <RenameTodoListModal
+                  data={{
+                    id: data?.id ?? '',
+                    title: data?.title ?? '',
+                  }}
+                />
+                <DeleteTodoModal id={todoId} />
+              </>
+            )}
           </div>
         </div>
       </div>
       <div className="mb-1 flex w-full flex-row gap-4">
-        <button
-          className="flex w-fit flex-row items-center gap-4 rounded-lg bg-slate-100 px-5 py-4 text-medium text-gray-700 ring-1 ring-gray-400"
-          type="button"
-          aria-label="button"
-        >
-          <PlusIcon size={18} className="flex-shrink-0" />{' '}
-          <span>Create New Task</span>
-        </button>
-        <button
-          className="flex w-fit flex-row items-center gap-4 rounded-lg bg-indigo-800 px-5 py-4 text-medium text-white ring-1 ring-indigo-400"
-          type="button"
-          aria-label="button"
-        >
-          <SparklesIcon size={18} className="flex-shrink-0" />{' '}
-          <span>Generate Todo with AI</span>
-        </button>
+        <AddTaskModal todoId={todoId} />
+        <AddTaskWithAIModal todoId={todoId} />
       </div>
-      <TodoList />
+      {Object.keys(data ?? {}).length > 0 && (
+        <TodoList data={data?.tasks ?? []} />
+      )}
     </div>
   );
 }

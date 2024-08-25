@@ -1,42 +1,22 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import update from 'immutability-helper';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
-import { type TodoTaskType } from '@/entities/todo';
+import { type TaskType } from '@/entities/task';
 
 import { TodoTask } from './block';
 
-export function TodoList() {
-  const initialDataTodoTasks: TodoTaskType[] = [
-    {
-      id: '1',
-      todoId: '1',
-      title: 'Task 1',
-      isDone: false,
-      position: 1,
-    },
-    {
-      id: '2',
-      todoId: '1',
-      title: 'Task 2',
-      isDone: true,
-      position: 2,
-    },
-    {
-      id: '3',
-      todoId: '1',
-      title: 'Task 3',
-      isDone: false,
-      position: 3,
-    },
-  ];
+export function TodoList({ data }: { data: TaskType[] }) {
+  const [dataTodoTasks, setDataTodoTasks] = useState(data);
 
-  const [dataTodoTasks, setDataTodoTasks] = useState(initialDataTodoTasks);
+  useEffect(() => {
+    setDataTodoTasks(data);
+  }, [data]);
 
   const moveTask = useCallback((dragIndex: number, hoverIndex: number) => {
-    setDataTodoTasks((prevTasks: TodoTaskType[]) =>
+    setDataTodoTasks((prevTasks: TaskType[]) =>
       update(prevTasks, {
         $splice: [
           [dragIndex, 1],
@@ -46,7 +26,7 @@ export function TodoList() {
     );
   }, []);
 
-  const renderTask = useCallback((task: TodoTaskType, index: number) => {
+  const renderTask = useCallback((task: TaskType, index: number) => {
     return (
       <TodoTask
         key={task.id}

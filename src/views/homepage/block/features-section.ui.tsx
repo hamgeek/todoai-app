@@ -12,13 +12,13 @@ export function FeaturesSection() {
       title: 'Effortless Navigation',
       description:
         'With a clean, streamlined design, navigating our app is a breeze. Quickly add, organize, and complete tasks with minimal effort, thanks to its easy-to-use features.',
-      imagePath: '/dashboard-preview.png',
+      imagePath: '/feature-2.png',
     },
     {
       title: 'Smart Task Planning with AI',
       description:
         'Boost your productivity with our integrated generative AI. Our app helps you create and plan tasks more efficiently, offering intelligent suggestions and automating routine tasks to save you time.',
-      imagePath: '/dashboard-preview.png',
+      imagePath: '/feature-3.png',
     },
   ];
 

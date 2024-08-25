@@ -5,12 +5,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
+import { Checkbox } from '@nextui-org/react';
 import { type Identifier, type XYCoord } from 'dnd-core';
-import { GripVertical, TrashIcon } from 'lucide-react';
+import { GripVertical } from 'lucide-react';
 import { type ChangeEvent, useRef, useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
-import { type TodoTaskType } from '@/entities/todo';
+import {
+  type TaskType,
+  useCompleteTask,
+  useMoveTask,
+  useUpdateTask,
+} from '@/entities/task';
+import { DeleteTaskModal } from '@/features/task';
 
 interface DragItem {
   index: number;
@@ -29,10 +36,13 @@ export function TodoTask({
   moveTask,
 }: {
   id: string;
-  data: TodoTaskType;
+  data: TaskType;
   index: number;
   moveTask: (dragIndex: number, hoverIndex: number) => void;
 }) {
+  const { handleCompleteTask } = useCompleteTask();
+  const { handleMoveTask } = useMoveTask();
+
   const ref = useRef<HTMLDivElement>(null);
   const [{ handlerId }, drop] = useDrop<
     DragItem,
@@ -103,6 +113,9 @@ export function TodoTask({
     collect: (monitor: any) => ({
       isDragging: monitor.isDragging(),
     }),
+    end(draggedItem) {
+      handleMoveTask(draggedItem.id, draggedItem.index);
+    },
   });
 
   const opacity = isDragging ? 0 : 1;
@@ -110,6 +123,7 @@ export function TodoTask({
   const [todoTextValue, setTodoTextValue] = useState(data.title);
   const [todoEditMode, setTodoEditMode] = useState(false);
   const editInputRef = useRef<HTMLInputElement>(null);
+  const { handleUpdateTask } = useUpdateTask();
 
   const handleSetEditMode = () => {
     setTodoEditMode(true);
@@ -121,11 +135,19 @@ export function TodoTask({
   const handleOnEditModeBlur = () => {
     if (todoTextValue.length > 0) {
       setTodoEditMode(false);
+      handleUpdateTask({
+        id: data.id,
+        title: todoTextValue,
+      });
     }
   };
 
   const handleOnInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setTodoTextValue(e.target.value);
+  };
+
+  const handleOnCompleteChange = (e: ChangeEvent<HTMLInputElement>) => {
+    handleCompleteTask(data.id, e.target.checked);
   };
 
   drag(drop(ref));
@@ -140,6 +162,12 @@ export function TodoTask({
       <div className="flex flex-row items-center">
         <GripVertical className="flex-shrink-0 cursor-move" size={22} />
       </div>
+      <Checkbox
+        onChange={handleOnCompleteChange}
+        color="primary"
+        size="md"
+        isSelected={data.isDone}
+      />
       <div className="flex flex-grow flex-row items-center">
         {todoEditMode ? (
           <input
@@ -152,7 +180,7 @@ export function TodoTask({
           />
         ) : (
           <p
-            className="text-base font-normal text-gray-600"
+            className={`text-base font-normal text-gray-600 ${data.isDone && 'line-through'}`}
             onClick={handleSetEditMode}
           >
             {todoTextValue}
@@ -160,11 +188,7 @@ export function TodoTask({
         )}
       </div>
       <div className="flex flex-row gap-2">
-        <TrashIcon
-          size={16}
-          className="flex-shrink-0 text-red-500"
-          strokeWidth={2}
-        />
+        <DeleteTaskModal id={data.id} />
       </div>
     </div>
   );
