@@ -3,6 +3,7 @@
 import { AlignJustify, LoaderCircleIcon } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import React from 'react';
+import { Toaster } from 'react-hot-toast';
 
 import { useSidebarStore } from '@/entities/sidebar';
 import { SidebarUI } from '@/views/block/sidebar';
@@ -34,6 +35,7 @@ export function WorkspaceLayoutUI({
       >
         <AlignJustify size={24} />
       </button>
+      <Toaster />
     </main>
   );
 }
