@@ -12,6 +12,7 @@
     "db:studio": "prisma studio",
     "dev": "next dev",
     "dev-turbo": "next dev --turbo",
+    "prebuild": "prisma db push",
     "postinstall": "prisma generate",
     "start": "next start",
     "lint": "next lint",
