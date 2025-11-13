@@ -143,7 +143,7 @@ export const taskRouter = createTRPCRouter({
             content: `${input.prompt}`,
           },
         ],
-        model: 'llama3-70b-8192',
+        model: 'openai/gpt-oss-120b',
       });
 
       const responseText = completion.choices[0]?.message.content ?? '';
